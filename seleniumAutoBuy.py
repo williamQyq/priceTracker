@@ -15,13 +15,15 @@ from selenium.webdriver.chrome.options import Options
 from openpyxl import load_workbook
 
 def main():
-    
-    df = init_excel()
-    driver=init_chrome_driver() 
 
-    iterate_quests(df,driver)
+    x = config.Config_static_user()
+    x.get_fname()
+    # df = init_excel()
+    # driver=init_chrome_driver() 
 
-    print("[Status]: === Finished, output result===\n")
+    # iterate_quests(df,driver)
+
+    # print("[Status]: === Finished, output result===\n")
 
 
 
@@ -35,12 +37,13 @@ def init_excel():
 
 
 def init_chrome_driver():
-    user_agent = config.Config_static_user().get_headers()
+    user_agent = config.Config_static_user()
+    user_agent_headers = user_agent.get_headers()
 
     chrome_options = Options() 
     chrome_options.add_experimental_option("detach",True)
-    chrome_options.add_argument(f'user-agent={user_agent}')
-    driver = webdriver.Chrome(executable_path=config.PATH, options=chrome_options)
+    chrome_options.add_argument(f'user-agent={user_agent_headers}')
+    driver = webdriver.Chrome(executable_path=user_agent.get_path(), options=chrome_options)
 
     
     print(f"[User Agent: \n{driver.execute_script('return navigator.userAgent;')}\n\n")

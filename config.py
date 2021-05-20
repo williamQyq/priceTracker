@@ -1,8 +1,12 @@
+import os
+import re
+import pandas as pd
+from openpyxl import load_workbook
+
 URL_INDEX = 1
 NEEDQUANTITY_INDEX = 2
 BUYBELOWPRICE_INDEX = 4
 STATUS_INDEX = 5
-PATH = r"C:\Program Files (x86)\chromedriver.exe"
 filename = "Tracker_Product.xlsx"
 
 class Config_static_user:
@@ -10,23 +14,31 @@ class Config_static_user:
     #===================================================
     f_name = "william"
     l_name = "J"
-    address = ""
-    city = ""
-    state = ""
-    zipCode = ""
-    email = ""
-    phone = ""
+    address = "26 clinton drive unit 123"
+    city = "Hollis"
+    state = "NH"
+    zipCode = "03049"
+    email = "ugotexpress.act001@gmail.com"
+    phone = "9788098625"
     #====================================================
-    credit_card_num = ""
-    expire_month = ""
-    expire_year = ""
-    cvv = ""
+    credit_card_num = "4199664858600096"
+    expire_month = "06"
+    expire_year = "2021"
+    cvv = "111"
     #====================================================
     headers = {'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
                 'Accept-Language': 'en-US, en;q=0.5'}
 
     def __init__(self, data=None):
+        info_tab_cols = [0,1]
+        payment_tab_cols = [3,4]
+        info_df = pd.read_excel(filename, sheet_name = "Config", usecols= info_tab_cols)
+        payment_df = pd.read_excel(filename, sheet_name = "Config", usecols= payment_tab_cols)
+   
+        info_dict =info_df.set_index('ID').T.to_dict('list')
+        payment_dict = payment_df.set_index('ID').T.to_dict('list')
+        
         if data is None:
             data={}
         else:
@@ -44,22 +56,54 @@ class Config_static_user:
             self.cvv = data['cvv']
 
     def get_fname(self):
-        return self.f_name
-    
+        
+        
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        # for col in ws.iter_cols(min_row=2,min_col = 2, max_col = 2):
+        #     for cell in col:
+        # print(info)
+      
+
     def get_lname(self):
-        return self.l_name
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        Info_tab = ws.tables["Info"]
+        lname=ws['B3']
+
+        return lname
     
     def get_address(self):
-        return self.address
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        Info_tab = ws.tables["Info"]
+        address=ws['B4']
+
+        return address
     
     def get_city(self):
-        return self.city
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        Info_tab = ws.tables["Info"]
+        city=ws['B5']
+
+        return city
     
     def get_state(self):
-        return self.state
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        Info_tab = ws.tables["Info"]
+        state=ws['B6']
+
+        return state
 
     def get_zipCode(self):
-        return self.zipCode
+        wb = load_workbook(filename)
+        ws = wb.worksheets[1]
+        Info_tab = ws.tables["Info"]
+        fname=ws['B2']
+
+        return fname
     
     def get_email(self):
         return self.email
@@ -81,4 +125,11 @@ class Config_static_user:
 
     def get_headers(self):
         return self.headers
+    
+    def get_path(self):
+        cwd = os.getcwd()
+        driver_path = "\chromedriver.exe"
+        chrome_driver_path = cwd+driver_path
+        return chrome_driver_path
+
         
