@@ -12,20 +12,22 @@ filename = "Tracker_Product.xlsx"
 class Config_static_user:
     #Bad practice, should encrypt private info, but whatever
     #===================================================
-    f_name = "william"
-    l_name = "J"
-    address = "26 clinton drive unit 123"
-    city = "Hollis"
-    state = "NH"
-    zipCode = "03049"
-    email = "ugotexpress.act001@gmail.com"
-    phone = "9788098625"
+    # f_name = "william"
+    # l_name = "J"
+    # address = "26 clinton drive unit 123"
+    # city = "Hollis"
+    # state = "NH"
+    # zipCode = "03049"
+    # email = "ugotexpress.act001@gmail.com"
+    # phone = "9788098625"
+    # #====================================================
+    # credit_card_num = "4199664858600096"
+    # expire_month = "06"
+    # expire_year = "2021"
+    # cvv = "111"
     #====================================================
-    credit_card_num = "4199664858600096"
-    expire_month = "06"
-    expire_year = "2021"
-    cvv = "111"
-    #====================================================
+    info_dict={}
+    payment_dict={}
     headers = {'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
                 'Accept-Language': 'en-US, en;q=0.5'}
@@ -36,92 +38,70 @@ class Config_static_user:
         info_df = pd.read_excel(filename, sheet_name = "Config", usecols= info_tab_cols)
         payment_df = pd.read_excel(filename, sheet_name = "Config", usecols= payment_tab_cols)
    
-        info_dict =info_df.set_index('ID').T.to_dict('list')
-        payment_dict = payment_df.set_index('ID').T.to_dict('list')
+        self.info_dict =info_df.set_index('ID').T.to_dict('list')
+        self.payment_dict = payment_df.set_index('Pay ID').T.to_dict('list')
         
+
         if data is None:
             data={}
         else:
-            self.f_name = data['f_name']
-            self.l_name = data['l_name']
-            self.address = data['address']
-            self.city = data['city']
-            self.state = data['state']
-            self.zipCode = data['zipCode']
-            self.email = data['email']
-            self.phone = data['phone']
-            self.credit_card_num = data['credit_card_num']
-            self.expire_month = data['expire_month']
-            self.expire_year = data['expire_year']
-            self.cvv = data['cvv']
+            self.data = data
 
     def get_fname(self):
-        
-        
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        # for col in ws.iter_cols(min_row=2,min_col = 2, max_col = 2):
-        #     for cell in col:
-        # print(info)
-      
+       fname ="".join(self.info_dict["First name"])
+       return fname
 
     def get_lname(self):
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        Info_tab = ws.tables["Info"]
-        lname=ws['B3']
-
+        lname ="".join(self.info_dict["Last name"])
         return lname
     
     def get_address(self):
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        Info_tab = ws.tables["Info"]
-        address=ws['B4']
-
+        address ="".join(self.info_dict["address"])
         return address
     
     def get_city(self):
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        Info_tab = ws.tables["Info"]
-        city=ws['B5']
-
+        city ="".join(self.info_dict["city"])
         return city
     
     def get_state(self):
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        Info_tab = ws.tables["Info"]
-        state=ws['B6']
-
+        state ="".join(self.info_dict["state"])
         return state
 
     def get_zipCode(self):
-        wb = load_workbook(filename)
-        ws = wb.worksheets[1]
-        Info_tab = ws.tables["Info"]
-        fname=ws['B2']
-
-        return fname
+        zip_code ="".join(self.info_dict["zip code"])
+        return zip_code
     
     def get_email(self):
-        return self.email
+        email ="".join(self.info_dict["email"])
+        return email
     
     def get_phone(self):
-        return self.phone
+        phone ="".join(self.info_dict["phone"])
+        return phone
     
     def get_credit_card_number(self):
-        return self.credit_card_num
-    
+        credit_num ="".join(self.payment_dict["credit num"])
+        return credit_num
+
     def get_credit_card_expire_month(self):
-        return self.expire_month
+        expire_month ="".join(self.payment_dict["expire month"])
+        return expire_month
 
     def get_credit_card_expire_year(self):
-        return self.expire_year
+        expire_year ="".join(self.payment_dict["expire year"])
+        return expire_year
     
     def get_credit_card_cvv(self):
-        return self.cvv
+        cvv ="".join(self.payment_dict["cvv"])
+        return cvv
+
+    def get_account(self):
+        account ="".join(self.payment_dict["account"])
+        return account
+
+    def get_account_password(self):
+        password ="".join(self.payment_dict["password"])
+        return password  
 
     def get_headers(self):
         return self.headers

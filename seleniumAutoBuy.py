@@ -16,14 +16,12 @@ from openpyxl import load_workbook
 
 def main():
 
-    x = config.Config_static_user()
-    x.get_fname()
-    # df = init_excel()
-    # driver=init_chrome_driver() 
+    df = init_excel()
+    driver=init_chrome_driver() 
 
-    # iterate_quests(df,driver)
+    iterate_quests(df,driver)
 
-    # print("[Status]: === Finished, output result===\n")
+    print("[Status]: === Finished, output result===\n")
 
 
 
