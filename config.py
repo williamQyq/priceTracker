@@ -76,11 +76,11 @@ class Config_static_user:
         return email
     
     def get_phone(self):
-        phone ="".join(self.info_dict["phone"])
+        phone ="".join(str(pho_num) for pho_num in self.info_dict["phone"])
         return phone
     
     def get_credit_card_number(self):
-        credit_num ="".join(self.payment_dict["credit num"])
+        credit_num ="".join(str(cre_num) for cre_num in self.payment_dict["credit num"])
         return credit_num
 
     def get_credit_card_expire_month(self):

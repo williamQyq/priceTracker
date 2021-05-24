@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import datetime
+import time
 
 import config
 import pandas as pd
@@ -15,13 +16,15 @@ from selenium.webdriver.chrome.options import Options
 from openpyxl import load_workbook
 
 def main():
-
+    
     df = init_excel()
     driver=init_chrome_driver() 
 
     iterate_quests(df,driver)
 
     print("[Status]: === Finished, output result===\n")
+
+    # driver.close()
 
 
 
@@ -67,11 +70,11 @@ def iterate_quests(df,driver):
                     auto_purchase(driver)
                     order_count+=1
                     driver.delete_all_cookies()
-                    print(f"[Success] *** Successful Placed Order No.{index} -- {i} times *** \n")
+                    print(f"[Success] *** Successful Placed Order No.{index} -- {i+1} times *** \n")
       
                 except:
                     error = True
-                    print(f"[Failure]: *** Failed auto purchase No.{index} -- {i} times ***\n")
+                    print(f"[Failure]: *** Failed auto purchase No.{index} -- {i+1} times ***\n")
                     record_result(config.filename,index,order_count,info,"fail")
                     driver.delete_all_cookies()
                     pass
@@ -82,7 +85,6 @@ def iterate_quests(df,driver):
         else:
             print("[Status]: === Finished, empty result===\n")
 
-    driver.close()
 
 def get_info(driver):
     info={
@@ -129,6 +131,8 @@ def record_result(filename,index,order_count,info,status):
 
 
 def auto_purchase(driver):
+
+    user = config.Config_static_user()
     #click add to cart button
     try:
         add_to_cart_btn = driver.find_element_by_class_name('add-to-cart-button')
@@ -139,9 +143,9 @@ def auto_purchase(driver):
 
     add_to_cart(driver)
 
-    fill_personal_info(driver)
+    fill_personal_info(driver,user)
 
-    fill_payment(driver)
+    fill_payment(driver,user)
 
     place_order(driver)
 
@@ -155,8 +159,8 @@ def add_to_cart(driver):
     try:
         element = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='/cart']")))
-        link = driver.find_element_by_link_text("Go to Cart")
-        link.click()
+        # link = driver.find_element_by_link_text("Go to Cart")
+        element.click()
     except:
         return print(f"[Error--Go to Cart]: ===Failure unable to wait for element loaded ===\n\n")
     
@@ -170,11 +174,13 @@ def add_to_cart(driver):
 
     #remove addons
     try:
+        # element = WebDriverWait(driver,20).until(
+        #     EC.element_to_be_clickable((By.LINK_TEXT, "Remove")))
         element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "addon-base__actions")))
+        addon_action_element = WebDriverWait(element,20).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Remove")))
-        addon_ele = driver.find_element_by_class_name('addons')
-        addon_action_link = addon_ele.find_element_by_link_text('Remove')
-        addon_action_link.click()
+        addon_action_element.click()
     except:
         print(f"[Error--Remove addons]: ===Failure unable to wait for remove element loaded ===:\n\n")
         pass
@@ -187,7 +193,10 @@ def add_to_cart(driver):
     except:
         return print(f"[Error--checkout-buttons__checkout]: ===Failure unable to wait for element loaded ===\n\n")
     
-    # click continue as Guest
+    # Login as existing customer
+
+
+    # Or click continue as Guest
     try:
         element = WebDriverWait(driver,20).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "cia-guest-content__continue")))
@@ -207,16 +216,29 @@ def add_to_cart(driver):
 
 
 
-def fill_personal_info(driver):
-    #init user
-    user = config.Config_static_user()
+def fill_personal_info(driver,user):
+    time.sleep(1)
+    try:
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.ID,"sc-store-availability-modal")))
+        print("[Status]: === Successful click sc-store modal ===\n")
+        
+        sel_store_element = WebDriverWait(element,20).until(
+            EC.element_to_be_clickable((By.XPATH,"//div[@data-test-id = 'select-store-button']")))
+        sel_store_element.click()
+        print("[Status]: === Successful click select this location ===\n")
+    except:
+        print(f"[Warning--Select This Location Jumped]: === Jump select this location elements ===\n")
+        pass
 
     # fill in contact info form
-
-    #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@aria-describedby='slfErrorAlert' and @name='username']"))).send_keys("KOB")
-    element = WebDriverWait(driver,20).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='firstName']")))
-    element.send_keys(user.get_fname())
+    try:
+        #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@aria-describedby='slfErrorAlert' and @name='username']"))).send_keys("KOB")
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='firstName']")))
+        element.send_keys(user.get_fname())
+    except:
+        return print(f"[Error--input firstName]: ===Failure unable to wait for element loaded ===\n\n")
 
     element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='lastName']")))
@@ -225,10 +247,6 @@ def fill_personal_info(driver):
     element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='street']")))
     element.send_keys(user.get_address())
-
-    element = WebDriverWait(driver,20).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='firstName']")))
-    element.send_keys(user.get_fname())
 
     element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='city']")))
@@ -263,15 +281,13 @@ def fill_personal_info(driver):
     return True
 
 
-def fill_payment(driver):
-
-    #init user
-    user = config.Config_static_user()
+def fill_payment(driver,user):
 
     try:
-        element = WebDriverWait(driver,10).until(
+        element = WebDriverWait(driver,20).until(
         EC.presence_of_all_elements_located((By.CLASS_NAME, "order-errors")))
-        continue_element = WebDriverWait(driver,10).until(
+        print(f"[Warning--Order shipping options changed]: === Jump to button-continue ===\n")
+        continue_element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CLASS_NAME, "button--continue")))
         continue_element.click()
     except:
@@ -296,7 +312,6 @@ def fill_payment(driver):
     print(f"[Status]: === Successful fill payment ===\n")
 
     return True
-
 
 
 
