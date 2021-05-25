@@ -10,22 +10,7 @@ STATUS_INDEX = 5
 filename = "Tracker_Product.xlsx"
 
 class Config_static_user:
-    #Bad practice, should encrypt private info, but whatever
-    #===================================================
-    # f_name = "william"
-    # l_name = "J"
-    # address = "26 clinton drive unit 123"
-    # city = "Hollis"
-    # state = "NH"
-    # zipCode = "03049"
-    # email = "ugotexpress.act001@gmail.com"
-    # phone = "9788098625"
-    # #====================================================
-    # credit_card_num = "4199664858600096"
-    # expire_month = "06"
-    # expire_year = "2021"
-    # cvv = "111"
-    #====================================================
+   
     info_dict={}
     payment_dict={}
     headers = {'User-Agent':

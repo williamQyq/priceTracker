@@ -24,7 +24,7 @@ def main():
 
     print("[Status]: === Finished, output result===\n")
 
-    # driver.close()
+    driver.close()
 
 
 
