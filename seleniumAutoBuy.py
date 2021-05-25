@@ -141,7 +141,7 @@ def auto_purchase(driver):
     except:
         return print("[Failure]: === unable to add to cart ===")
 
-    add_to_cart(driver)
+    add_to_cart(driver,user)
 
     fill_personal_info(driver,user)
 
@@ -153,7 +153,7 @@ def auto_purchase(driver):
 
 
 
-def add_to_cart(driver):
+def add_to_cart(driver,user):
 
     #click a href www.bestbuy.com/cart
     try:
@@ -194,9 +194,56 @@ def add_to_cart(driver):
         return print(f"[Error--checkout-buttons__checkout]: ===Failure unable to wait for element loaded ===\n\n")
     
     # Login as existing customer
+    try:
+        login_account(driver,user)
+    except:
+        login_guest(driver)
 
 
-    # Or click continue as Guest
+    return print(f"[Status]: === Successful click loaded element ===\n")
+
+def login_account(driver,user):
+    try:
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "input[type='email']")))
+        element.send_keys(user.get_account())
+    except:
+        print(f"[Error--input account]: ===Failure unable to wait for element loaded ===\n\n")
+        return False
+
+    try:
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "input[type='password']")))
+        element.send_keys(user.get_account_password())
+    except:
+        print(f"[Error--input account password]: ===Failure unable to wait for element loaded ===\n\n")
+        return False
+
+    try:
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "cia-form__controls")))
+        element.click()
+    except:
+        print(f"[Error--input account]: ===Failure unable to wait for element loaded ===\n\n")
+        return False
+
+    try:
+        element = WebDriverWait(driver,5).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "cia-alert")))
+        print(f"[Error--account or password incorrect]: ===Failure unable to login account ===\n\n")
+        return False
+    except:
+        # click switch to shipping link
+        try:
+            element = WebDriverWait(driver,20).until(
+                EC.element_to_be_clickable((By.LINK_TEXT, "Switch to Shipping")))
+            element.click()
+        except:
+            print(f"[Error--switch free shipping]: ===Failure unable to wait for element loaded ===\n\n")
+            return False
+
+def login_guest(driver):
+      # Or click continue as Guest
     try:
         element = WebDriverWait(driver,20).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "cia-guest-content__continue")))
@@ -207,19 +254,15 @@ def add_to_cart(driver):
     # click switch to shipping link
     try:
         element = WebDriverWait(driver,20).until(
-            EC.element_to_be_clickable((By.CLASS_NAME, "ispu-card__switch")))
+            EC.element_to_be_clickable((By.LINK_TEXT, "Switch to Shipping")))
         element.click()
     except:
         return print(f"[Error--switch free shipping]: ===Failure unable to wait for element loaded ===\n\n")
 
-    return print(f"[Status]: === Successful click loaded element ===\n")
-
-
-
 def fill_personal_info(driver,user):
-    time.sleep(1)
+    
     try:
-        element = WebDriverWait(driver,20).until(
+        element = WebDriverWait(driver,5).until(
             EC.element_to_be_clickable((By.ID,"sc-store-availability-modal")))
         print("[Status]: === Successful click sc-store modal ===\n")
         
@@ -227,13 +270,16 @@ def fill_personal_info(driver,user):
             EC.element_to_be_clickable((By.XPATH,"//div[@data-test-id = 'select-store-button']")))
         sel_store_element.click()
         print("[Status]: === Successful click select this location ===\n")
+
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.LINK_TEXT, "ispu-card__switch")))
+        element.click()
+    
     except:
-        print(f"[Warning--Select This Location Jumped]: === Jump select this location elements ===\n")
-        pass
+        print(f"[Attention --Select This Location Jumped]: === Jump select this location elements ===\n")
 
     # fill in contact info form
     try:
-        #WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@aria-describedby='slfErrorAlert' and @name='username']"))).send_keys("KOB")
         element = WebDriverWait(driver,20).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='firstName']")))
         element.send_keys(user.get_fname())
@@ -263,22 +309,26 @@ def fill_personal_info(driver,user):
         EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='zipcode']")))
     element.send_keys(user.get_zipCode())
 
-    element = WebDriverWait(driver,20).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='emailAddress']")))
-    element.send_keys(user.get_email())
+    try:
+        element = WebDriverWait(driver,5).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='emailAddress']")))
+        element.send_keys(user.get_email())
+    except:
+        print(f"[Attention --input emailaddress Jumped]: === Jump input email, already login ===\n")
 
     element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "input[id$='phone']")))
     element.send_keys(user.get_phone())
 
-    # click Continue to payment information
-    element = WebDriverWait(driver,20).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "button--continue")))
-    element.click()
+    try:
+        # click Continue to payment information
+        element = WebDriverWait(driver,20).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "button--continue")))
+        element.click()
+        print(f"[Status]: === Successful fill personal info ===\n")
+    except:
+        print(f"[Error--continue to paymnent]: ===Failure unable to wait for element loaded ===\n\n")
 
-    print(f"[Status]: === Successful fill personal info ===\n")
-
-    return True
 
 
 def fill_payment(driver,user):
@@ -286,7 +336,7 @@ def fill_payment(driver,user):
     try:
         element = WebDriverWait(driver,20).until(
         EC.presence_of_all_elements_located((By.CLASS_NAME, "order-errors")))
-        print(f"[Warning--Order shipping options changed]: === Jump to button-continue ===\n")
+        print(f"[Attention --Order shipping options changed]: === Jump to button-continue ===\n")
         continue_element = WebDriverWait(driver,20).until(
         EC.element_to_be_clickable((By.CLASS_NAME, "button--continue")))
         continue_element.click()
