@@ -1,6 +1,6 @@
 # priceTracker
 
-1. download chrome driver to "C:\Program Files (x86)\chromedriver.exe"
-2. pip install all tools
-3. fill config.py with necessary information
-4. python run program
+1. download chrome driver to tracker path folder
+2. pip install -r req_packages.txt
+3. fill Product_Tracker.xlsx excel config sheet with necessary information
+4. python .\seleniumAutoBuy.py or click program
