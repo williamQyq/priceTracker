@@ -7,7 +7,7 @@ URL_INDEX = 1
 NEEDQUANTITY_INDEX = 2
 BUYBELOWPRICE_INDEX = 4
 STATUS_INDEX = 5
-filename = "Tracker_Product.xlsx"
+filename = "Product_Tracker.xlsx"
 
 class Config_static_user:
    
