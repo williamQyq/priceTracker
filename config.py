@@ -1,7 +1,5 @@
 import os
-import re
 import pandas as pd
-from openpyxl import load_workbook
 
 URL_INDEX = 1
 NEEDQUANTITY_INDEX = 2
